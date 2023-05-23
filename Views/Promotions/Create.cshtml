@@ -1,0 +1,30 @@
+﻿@model Mercadona4.Models.Promotion
+
+@{
+    ViewData["Title"] = "Créer une promotion - tableau de bord - Mercadona";
+}
+
+<h2>Créer une promotion</h2>
+
+<a class="returnbutton" asp-action="Index">Retour</a>
+
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input asp-for="StartDate" />
+    <span asp-validation-for="StartDate" class="text-danger"></span>
+
+    <input asp-for="EndDate" />
+    <span asp-validation-for="EndDate" class="text-danger"></span>
+
+    <input asp-for="DiscountPercentage" placeholder="Pourcentage de réduction" />
+    <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
+
+    <input type="submit" value="Créer" />
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

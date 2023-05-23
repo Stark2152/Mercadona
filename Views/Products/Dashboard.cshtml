@@ -1,0 +1,102 @@
+﻿@model IEnumerable<Mercadona4.Models.Product>
+
+@{
+    ViewData["Title"] = "Tableau de bord - Mercadona";
+}
+
+<h2>Tableau de bord</h2>
+
+<div class="manage_buttons">
+    <a class="managebuttons" asp-action="Index">Revenir au catalogue</a>
+    <a class="managebuttons" asp-action="Create">Créer un produit</a>
+    <a class="managebuttons" asp-controller="Promotions" asp-action="Index">Gérer les promotions</a>
+</div>
+
+@if (Model.Any())
+{
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 10%;">
+                    Nom
+                </th>
+                <th>
+                    Description
+                </th>
+                <th style="width: 6%;">
+                    Prix
+                </th>
+                <th style="width: 10%;">
+                    Image
+                </th>
+                <th style="width: 10%;">
+                    Catégorie
+                </th>
+                <th style="width: 29%;">
+                    Promotion
+                </th>
+                <th style="width: 12%;">
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Label)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)€
+                    </td>
+                    <td>
+                        <div class="dproduct-image">
+                            <img src="@Html.DisplayFor(modelItem => item.ImageUrl)" alt="Image de @Html.DisplayFor(modelItem => item.Label)">
+                        </div>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category)
+                    </td>
+
+                    <td>
+                        @if (item.Promotion != null)
+                        {
+                            <span>
+                                -@item.Promotion.DiscountPercentage.ToString()% (du <strong>@item.Promotion.StartDate</strong> au <strong>@item.Promotion.EndDate</strong>)<br>
+                                @if (DateTime.Now <= item.Promotion.StartDate)
+                                {
+                                    <span>(en attente)</span>
+                                }
+                                else if (DateTime.Now >= item.Promotion.StartDate && DateTime.Now <= item.Promotion.EndDate)
+                                {
+                                    <span>(en cours)</span>
+                                }
+                                else if (DateTime.Now >= item.Promotion.EndDate)
+                                {
+                                    <span style="color: red">(expiré)</span>
+                                }
+                            </span>
+                        }
+                        else
+                        {
+                            <span>Sans promotion</span>
+                        }
+                    </td>
+
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Modifier</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Supprimer</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <center><h3>Il n'y a aucun produit. Veuillez créer un ou des produits pour qu'ils apparaissent ici.</h3></center>
+}

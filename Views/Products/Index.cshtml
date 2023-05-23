@@ -1,0 +1,138 @@
+﻿@model IEnumerable<Mercadona4.Models.Product>
+
+@{
+    ViewData["Title"] = "Catalogue - Mercadona";
+}
+
+@if (Model.Any())
+{
+    <div class="fiv">
+        <select id="category-select" name="category" class="filter">
+            <option value="">Tout</option>
+            <option value="Fruits">Fruits</option>
+            <option value="Légumes">Légumes</option>
+            <option value="Produits laitiers">Produits laitiers</option>
+            <option value="Surgelés">Surgelés</option>
+        </select>
+
+        @if (Context.Session.GetString("Authenticated") == "true")
+        {
+            <p>
+                <a class="adminbutton" asp-action="Dashboard">Gérer les produits</a>
+            </p>
+        }
+    </div>
+
+    <div class="container">
+        @foreach (var item in Model)
+        {
+            <div class="product">
+                <div class="product-image">
+                    <img src="@Html.DisplayFor(modelItem => item.ImageUrl)" alt="Image de @Html.DisplayFor(modelItem => item.Label)">
+                </div>
+                <div class="product-info">
+                    <h2 class="product-title">@Html.DisplayFor(modelItem => item.Label)</h2>
+                    <p class="product-description">@Html.DisplayFor(modelItem => item.Description)</p>
+
+                    @if (item.Promotion != null)
+                    {
+                        if (DateTime.Now >= item.Promotion.StartDate && DateTime.Now <= item.Promotion.EndDate)
+                        {   
+                            var finalPrice = item.Price * (1 - item.Promotion.DiscountPercentage / 100);
+                            <p class="product-price">
+                                <del style="font-size: 1.25vw;">@Html.DisplayFor(modelItem => item.Price)€</del>
+                                <strong style="color: #e74c3c;">(-@item.Promotion.DiscountPercentage.ToString()%) <br> @finalPrice.ToString("F2")€</strong>
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="product-price" style="display: flex; align-items: center">
+                                <span>@Html.DisplayFor(modelItem => item.Price)€</span>
+                            </p>
+                        }
+                    }
+                    else
+                    {
+                        <p class="product-price" style="display: flex; align-items: center">
+                            <span>@Html.DisplayFor(modelItem => item.Price)€</span>
+                        </p>
+                    }
+
+                    <p class="product-category">@Html.DisplayFor(modelItem => item.Category)</p>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <h2 style="margin-top: 10%;">Il n'y a aucun produit pour le moment.</h2>
+    @if (Context.Session.GetString("Authenticated") == "true")
+    {
+        <a class="returnbutton" id="admbut" asp-action="Dashboard">Gérer les produits</a>
+    }
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    // Fonction pour formatter le prix et la promotion d'un produit
+    function formatPrice(product) {
+        if (product.promotion) {
+            if (new Date(product.promotion.startDate) <= new Date() && new Date(product.promotion.endDate) >= new Date()) {
+                var finalPrice = product.price * (1 - product.promotion.discountPercentage / 100);
+                return `<p class="product-price"><del style="font-size: 1.25vw;">${product.price.toFixed(2).replace('.', ',')}€</del> <strong style="color: #e74c3c;">(-${product.promotion.discountPercentage}%) <br> ${finalPrice.toFixed(2).replace('.', ',')}€</strong></p>`;
+            } else {
+                return `<p class="product-price" style="display: flex; align-items: center"><span>${product.price.toFixed(2).replace('.', ',')}€</span></p>`;
+            }
+        } else {
+            return `<p class="product-price" style="display: flex; align-items: center"><span>${product.price.toFixed(2).replace('.', ',')}€</span></p>`;
+        }
+    }
+
+    // Fonction pour créer une structure de produit
+    function createProductStructure(product) {
+        return `
+                    <div class="product">
+                        <div class="product-image">
+                            <img src="${product.imageUrl}" alt="Image de ${product.label}">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">${product.label}</h2>
+                            <p class="product-description">${product.description}</p>
+                            ${formatPrice(product)}
+                            <p class="product-category">${product.category}</p>
+                        </div>
+                    </div>
+                `;
+    }
+
+    // Attache l'événement de changement au select
+    $(document).ready(function () {
+        // Réinitialisez la valeur du select à la première option (qui devrait être "Toutes les catégories")
+        $('#category-select').prop('selectedIndex', 0);
+
+        $('#category-select').change(function () {
+            var selectedCategory = $(this).val();
+
+            // Si la catégorie sélectionnée est une chaîne vide (Toutes les catégories), afficher tous les produits
+            if (selectedCategory === '') {
+                selectedCategory = null; // Ou une autre valeur que votre API peut comprendre comme "tous les produits"
+            }
+
+            $.ajax({
+                url: '@Url.Action("GetProductsByCategory", "Products")',
+                data: { category: selectedCategory },
+                success: function (data) {
+                    $('.container').empty();
+                    if (data.length === 0) {
+                        $('.container').append('<h2 style="margin-top: 10%;">Aucun produit trouvé pour cette catégorie.</h2>');
+                    } else {
+                        data.forEach(function (item) {
+                            $('.container').append(createProductStructure(item));
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>

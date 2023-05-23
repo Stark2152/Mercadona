@@ -1,0 +1,55 @@
+﻿@model Mercadona4.Models.Product
+
+@{
+    ViewData["Title"] = "Supprimer un produit - tableau de bord - Mercadona";
+}
+
+<h2>Supprimer un produit</h2>
+
+<a class="returnbutton" asp-action="Dashboard">Retour</a>
+
+<h3 style="text-align: center;">Êtes-vous sûr de vouloir supprimer ce produit ?</h3>
+<form asp-action="Delete">
+    <table style="width: 98%">
+        <tr>
+            <th style="width: 25%">Nom</th>
+            <td>@Html.DisplayFor(model => model.Label)</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>@Html.DisplayFor(model => model.Description)</td>
+        </tr>
+        <tr>
+            <th>Prix</th>
+            <td>@Html.DisplayFor(model => model.Price)€</td>
+        </tr>
+        <tr>
+            <th>Image</th>
+            <td>
+                <div class="dproduct-image" style="width: 25%; padding-bottom: 25%; margin-left: auto; margin-right: auto;">
+                    <img src="@Html.DisplayFor(model => model.ImageUrl)" alt="Image de @Html.DisplayFor(model => model.Label)">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>Catégorie</th>
+            <td>@Html.DisplayFor(model => model.Category)</td>
+        </tr>
+        <tr>
+            <th>Promotion</th>
+            <td>
+                @if (Model.Promotion != null)
+                {
+                    <span>-@Model.Promotion.DiscountPercentage.ToString()%</span>
+                }
+                else
+                {
+                    <span>Sans promotion</span>
+                }
+            </td>
+        </tr>
+    </table>
+
+    <input type="hidden" asp-for="Id" />
+    <input class="delbutton" type="submit" value="Supprimer" />
+</form>

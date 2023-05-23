@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+	
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		
+		<title>@ViewData["Title"]</title>
+		
+		<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	
+	</head>
+	
+	<body>
+		
+		<header>
+            <nav class="my_navbar">
+                <div class="navbar-container">
+					<a asp-controller="Home" asp-action="Index"><img src="~/images/logo.svg" alt="Mercadona" title="Supermercados de confianza"></a>
+                    <ul class="navbar-menu">
+                        <li>
+							<a class="navbar-link" href="https://www.mercadona.es/" target="_blank">Site Officiel <img style="width: 16px; vertical-align: sub;" src="~/images/newtab.png" alt="new tab"></a>
+						</li>
+                        <li>
+							<a class="navbar-link" asp-controller="Products" asp-action="Index">Catalogue</a>
+						</li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+		
+		<main role="main">
+			@RenderBody()
+		</main>
+		
+		<footer id="footer" class="footer">
+            <p class="footer-text">
+				&copy; 2023 Mercadona S.A. Todos los derechos reservados. 
+				@if (Context.Session.GetString("Authenticated") == "true")
+				{
+					<a class="footer-buttonout" asp-controller="Account" asp-action="Logout">Se déconnecter</a>
+				}
+				else
+				{
+					<a class="footer-button" asp-controller="Account" asp-action="Login">Accéder au tableau de bord</a>
+				}
+			</p>
+        </footer>
+		
+		<script src="~/lib/jquery/dist/jquery.min.js"></script>
+		<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="~/js/site.js" asp-append-version="true"></script>
+		@await RenderSectionAsync("Scripts", required: false)
+		
+	</body>
+	
+</html>

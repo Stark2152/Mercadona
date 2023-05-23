@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Mercadona4.Models.Promotion>
+
+@{
+    ViewData["Title"] = "Promotions - tabbleau de bord - Mercadona";
+}
+
+<h2>Promotions</h2>
+
+<div class="manage_buttons">
+    <a class="managebuttons" asp-controller="Products" asp-action="Dashboard">Revenir au tableau de bord</a>
+    <a class="managebuttons" asp-action="Create">Créer une promotion</a>
+</div>
+
+@if (Model.Any())
+{
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    Début de la promotion
+                </th>
+                <th>
+                    Fin de la promotion
+                </th>
+                <th>
+                    Pourcentage de réduction
+                </th>
+                <th>
+                    État
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndDate)
+                    </td>
+                    <td>
+                        -@item.DiscountPercentage.ToString()%
+                    </td>
+                    <td>
+                        @if (DateTime.Now <= item.StartDate)
+                        {
+                            <span>En attente</span>
+                        }
+                        else if (DateTime.Now >= item.StartDate && DateTime.Now <= item.EndDate)
+                        {
+                            <span>Disponible</span>
+                        }
+                        else if (DateTime.Now >= item.EndDate)
+                        {
+                            <span style="color: red">Expirée</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Modifier</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Supprimer</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <center><h3>Il n'y a aucune promotion. Veuillez créer une ou des promotions pour qu'elles apparaissent ici.</h3></center>
+}

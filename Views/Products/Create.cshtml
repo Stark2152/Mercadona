@@ -1,0 +1,60 @@
+﻿@model Mercadona4.Models.Product
+
+@{
+    ViewData["Title"] = "Créer un produit - tableau de bord - Mercadona";
+}
+
+<h2>Créer un produit</h2>
+
+<a class="returnbutton" asp-action="Dashboard">Retour</a>
+
+<form asp-action="Create" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input asp-for="Label" placeholder="Nom du produit"/>
+    <span asp-validation-for="Label" class="text-danger"></span>
+
+    <input asp-for="Description" placeholder="Description du produit"/>
+    <span asp-validation-for="Description" class="text-danger"></span>
+
+    <input asp-for="Price" data-val="false" placeholder="Prix du produit"/>
+    <span asp-validation-for="Price" class="text-danger"></span>
+
+    <input type="file" name="ImageUpload"/>
+
+    <select asp-for="Category">
+        <option disabled selected>Sélectionnez une catégorie</option>
+        <option value="Fruits">Fruits</option>
+        <option value="Légumes">Légumes</option>
+        <option value="Produits laitiers">Produits laitiers</option>
+        <option value="Surgelés">Surgelés</option>
+    </select>
+    <span asp-validation-for="Category" class="text-danger"></span>
+
+    <select asp-for="PromotionId">
+        <option value="">Sans promotion</option>
+        @if (ViewBag.PromotionId != null)
+        {
+            var promotionList = ViewBag.PromotionId as SelectList;
+            if (promotionList != null && promotionList.Any())
+            {
+                foreach (var item in promotionList)
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            }
+            else
+            {
+                <option disabled>Aucune promotion trouvée. Veuillez en créer une pour qu'elle apparaisse ici.</option>
+            }
+        }
+    </select>
+
+    <input type="submit" value="Créer"/>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
