@@ -437,3 +437,10 @@ tr:hover {
         color: #ed6f00;
         background: #fff;
     }
+
+.information {
+    display: flex;
+    justify-content: center;
+    color: gray;
+    margin-top: 1%;
+}
