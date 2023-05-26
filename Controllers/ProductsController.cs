@@ -78,17 +78,9 @@ namespace Mercadona4.Controllers
         {
             if (ModelState.IsValid && ImageUpload != null)
             {
-                int newId;
-                do
-                {
-                    Random random = new();
-                    newId = random.Next(1, 1000000);
-                }
-                while (_context.Products.Any(p => p.Id == newId));
+                product.Id = _context.Products.DefaultIfEmpty().Max(p => p == null ? 0 : p.Id) + 1;
 
-                product.Id = newId;
-
-                var fileName = $"{newId}.jpg";
+                var fileName = $"{product.Id}.jpg";
                 var filePath = Path.Combine("wwwroot", "products_images", fileName);
                 using (var stream = System.IO.File.Create(filePath))
                 {
@@ -258,7 +250,7 @@ namespace Mercadona4.Controllers
             if (product != null)
             {
                 var fileName = $"{product.Id}.jpg";
-                System.IO.File.Delete(Path.Combine("wwwroot", "images", fileName));
+                System.IO.File.Delete(Path.Combine("wwwroot", "products_images", fileName));
                 _context.Products.Remove(product);
             }
 
