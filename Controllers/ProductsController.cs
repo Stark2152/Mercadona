@@ -47,32 +47,33 @@ namespace Mercadona4.Controllers
             }
         }
 
-        // GET: Products/Create
-        public IActionResult Create()
-        {
-            if (HttpContext.Session.GetString("Authenticated") == "true")
-            {
-                var promotions = _context.Promotions
-             .AsEnumerable()
-             .OrderBy(p => p.StartDate)
-             .Select(p => new
-             {
-                 p.Id,
-                 DiscountDisplay = GeneratePromotionDisplay(p)
-             })
-             .ToList();
+		// GET: Products/Create
+		public IActionResult Create()
+		{
+			if (HttpContext.Session.GetString("Authenticated") == "true")
+			{
+				var promotions = _context.Promotions
+					.AsEnumerable()
+					.Where(p => p.EndDate > DateTime.UtcNow) // Seules les promotions non expirées
+					.OrderBy(p => p.StartDate)
+					.Select(p => new
+					{
+						p.Id,
+						DiscountDisplay = GeneratePromotionDisplay(p)
+					})
+					.ToList();
 
-                ViewBag.PromotionId = new SelectList(promotions, "Id", "DiscountDisplay");
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Account");
-            }
-        }
+				ViewBag.PromotionId = new SelectList(promotions, "Id", "DiscountDisplay");
+				return View();
+			}
+			else
+			{
+				return RedirectToAction("Login", "Account");
+			}
+		}
 
-        // POST: Products/Create
-        [HttpPost]
+		// POST: Products/Create
+		[HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Label,Description,Price,ImageUrl,Category,PromotionId")] Product product, IFormFile ImageUpload)
         {

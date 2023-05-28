@@ -66,6 +66,12 @@ form {
             cursor: pointer;
         }
 
+#errorMessage {
+    color: #ed6f00;
+    font-weight: bold;
+}
+
+
 /*::::::::::: HEADER :::::::::*/
 
 .my_navbar {
@@ -134,6 +140,7 @@ form {
     -moz-osx-font-smoothing: grayscale
 }
 
+
 /*::::::::::: HOME :::::::::*/
 
 .header-section {
@@ -178,6 +185,7 @@ form {
         opacity: 1;
     }
 }
+
 
 /*::::::::::: CATALOGUE :::::::::*/
 
@@ -301,6 +309,7 @@ form {
     margin-bottom: 0;
 }
 
+
 /*::::::::::: DASHBOARD :::::::::*/
 
 .manage_buttons {
@@ -366,7 +375,9 @@ tr:hover {
     object-fit: cover;
 }
 
+
 /*::::::::::: FORMS :::::::::*/
+
 .returnbutton {
     position: absolute;
     background: #00ab61;
@@ -391,7 +402,9 @@ tr:hover {
         background: #fff !important;
     }
 
+
 /*::::::::::: FOOTER :::::::::*/
+
 .footer {
     background-color: #1c3037;
     width: 100%;
