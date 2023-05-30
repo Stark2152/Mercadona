@@ -8,50 +8,123 @@
 
 <a class="returnbutton" asp-action="Dashboard">Retour</a>
 
-        <form asp-action="Edit" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+<form id="product-form" asp-action="Edit" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
 
-                <input asp-for="Label" placeholder="Nom du produit"/>
-                <span asp-validation-for="Label" class="text-danger"></span>
+    <input id="label-input" asp-for="Label" placeholder="Nom du produit" />
+    <div id="label-error" class="text-danger"></div>
 
-    <input asp-for="Description" placeholder="Description du produit" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+    <input id="description-input" asp-for="Description" placeholder="Description du produit" />
+    <div id="description-error" class="text-danger"></div>
 
-    <input asp-for="Price" data-val="false" placeholder="Prix du produit" />
-                <span asp-validation-for="Price" class="text-danger"></span>
+    <input id="price-input" asp-for="Price" data-val="false" placeholder="Prix du produit" />
+    <div id="price-error" class="text-danger"></div>
 
-                <input type="file" name="ImageUpload" />
+    <input id="image-input" type="file" name="ImageUpload" />
+    <div id="image-error" class="text-danger"></div>
 
-                <select asp-for="Category">
-                    <option value="Fruits">Fruits</option>
-                    <option value="Légumes">Légumes</option>
-                    <option value="Produits laitiers">Produits laitiers</option>
-                    <option value="Surgelés">Surgelés</option>
-                </select>
-                <span asp-validation-for="Category" class="text-danger"></span>
+    <select id="category-input" asp-for="Category">
+        <option disabled selected>Sélectionnez une catégorie</option>
+        <option value="Fruits">Fruits</option>
+        <option value="Légumes">Légumes</option>
+        <option value="Produits laitiers">Produits laitiers</option>
+        <option value="Surgelés">Surgelés</option>
+    </select>
+    <div id="category-error" class="text-danger"></div>
 
-                <select asp-for="PromotionId">
-                    <option value="">Sans promotion</option>
-                    @if (ViewBag.PromotionId != null)
-                    {
-                        var promotionList = ViewBag.PromotionId as SelectList;
-                        if (promotionList != null && promotionList.Any())
-                        {
-                            foreach (var item in promotionList)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        }
-                        else
-                        {
-                            <option disabled>Aucune promotion trouvée. Veuillez en créer une pour qu'elle apparaisse ici.</option>
-                        }
-                    }
-                </select>
+    <select asp-for="PromotionId">
+        <option value="">Sans promotion</option>
+        @if (ViewBag.PromotionId != null)
+        {
+            var promotionList = ViewBag.PromotionId as SelectList;
+            if (promotionList != null && promotionList.Any())
+            {
+                foreach (var item in promotionList)
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            }
+            else
+            {
+                <option disabled>Aucune promotion trouvée. Veuillez en créer une pour qu'elle apparaisse ici.</option>
+            }
+        }
+    </select>
 
-                <input type="submit" value="Modifier" />
-        </form>
+    <input id="submit-button" type="submit" value="Modifier" />
+</form>
+
+<script>
+    document.getElementById('product-form').addEventListener('submit', function (event) {
+        var isValid = true;
+
+        var labelInput = document.getElementById('label-input');
+        var labelError = document.getElementById('label-error');
+        if (labelInput.value.length > 14 || labelInput.value.length < 3) {
+            isValid = false;
+            if (labelInput.value.length < 3) {
+                labelError.textContent = 'Le nom du produit doit comporter au moins 3 caractères.';
+            } else {
+                labelError.textContent = 'Le nom du produit ne doit pas dépasser 14 caractères.';
+            }
+        } else {
+            labelError.textContent = '';
+        }
+
+        var descriptionInput = document.getElementById('description-input');
+        var descriptionError = document.getElementById('description-error');
+        if (descriptionInput.value.length === 0) {
+            isValid = false;
+            descriptionError.textContent = 'La description est obligatoire.';
+        } else {
+            descriptionError.textContent = '';
+        }
+
+        var priceInput = document.getElementById('price-input');
+        var priceError = document.getElementById('price-error');
+        var priceValue = priceInput.value.replace('.', ',');  // Remplacer le point par une virgule
+        var price = parseFloat(priceValue.replace(',', '.')); // Remplacer la virgule par un point pour la validation
+        if (isNaN(price) || price < 0.01 || price > 999.99) {
+            isValid = false;
+            priceError.textContent = 'Le prix doit être entre 0,01€ et 999,99€.';
+        } else {
+            priceError.textContent = '';
+            priceInput.value = priceValue; // Rétablir la valeur d'origine (avec une virgule) après la validation
+        }
+
+
+        var imageInput = document.getElementById('image-input');
+        var imageError = document.getElementById('image-error');
+        var file = imageInput.files[0];
+        if (file) {
+            var fileSize = file.size / 1024 / 1024; // size in MB
+            var validFileTypes = ['image/jpeg', 'image/png'];
+            if (fileSize > 150) {
+                isValid = false;
+                imageError.textContent = 'L\'image ne doit pas dépasser 150Mo.';
+            } else if (!validFileTypes.includes(file.type)) {
+                isValid = false;
+                imageError.textContent = 'Le format de l\'image doit être .jpg, .jpeg ou .png.';
+            } else {
+                imageError.textContent = '';
+            }
+        }
+
+        var categoryInput = document.getElementById('category-input');
+        var categoryError = document.getElementById('category-error');
+        var validCategories = ['Fruits', 'Légumes', 'Produits laitiers', 'Surgelés'];
+        if (!validCategories.includes(categoryInput.value)) {
+            isValid = false;
+            categoryError.textContent = 'Veuillez sélectionner une catégorie valide.';
+        } else {
+            categoryError.textContent = '';
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+</script>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

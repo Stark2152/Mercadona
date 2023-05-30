@@ -47,36 +47,72 @@ namespace Mercadona4.Controllers
             }
         }
 
-		// GET: Products/Create
-		public IActionResult Create()
-		{
-			if (HttpContext.Session.GetString("Authenticated") == "true")
-			{
-				var promotions = _context.Promotions
-					.AsEnumerable()
-					.Where(p => p.EndDate > DateTime.UtcNow) // Seules les promotions non expirées
-					.OrderBy(p => p.StartDate)
-					.Select(p => new
-					{
-						p.Id,
-						DiscountDisplay = GeneratePromotionDisplay(p)
-					})
-					.ToList();
+        // GET: Products/Create
+        public IActionResult Create()
+        {
+            if (HttpContext.Session.GetString("Authenticated") == "true")
+            {
+                var promotions = _context.Promotions
+                    .AsEnumerable()
+                    .Where(p => p.EndDate > DateTime.UtcNow) // Seules les promotions non expirées
+                    .OrderBy(p => p.StartDate)
+                    .Select(p => new
+                    {
+                        p.Id,
+                        DiscountDisplay = GeneratePromotionDisplay(p)
+                    })
+                    .ToList();
 
-				ViewBag.PromotionId = new SelectList(promotions, "Id", "DiscountDisplay");
-				return View();
-			}
-			else
-			{
-				return RedirectToAction("Login", "Account");
-			}
-		}
+                ViewBag.PromotionId = new SelectList(promotions, "Id", "DiscountDisplay");
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+        }
 
-		// POST: Products/Create
-		[HttpPost]
+        // POST: Products/Create
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Label,Description,Price,ImageUrl,Category,PromotionId")] Product product, IFormFile ImageUpload)
         {
+            var validCategories = new List<string> { "Fruits", "Légumes", "Produits laitiers", "Surgelés" };
+            var validFileTypes = new List<string> { "image/jpeg", "image/png" };
+
+            if (product.Label.Length > 14 || product.Label.Length < 3)
+            {
+                ModelState.AddModelError("Label", "Le nom du produit doit comporter entre 3 et 14 caractères.");
+            }
+
+            if (product.Description.Length == 0)
+            {
+                ModelState.AddModelError("Description", "La description est obligatoire.");
+            }
+
+            if (product.Price < 0.01m || product.Price > 999.99m)
+            {
+                ModelState.AddModelError("Price", "Le prix doit être entre 0,01€ et 999,99€.");
+            }
+
+            if (ImageUpload != null)
+            {
+                var fileSize = ImageUpload.Length / 1024 / 1024; // size in MB
+                if (fileSize > 5)
+                {
+                    ModelState.AddModelError("ImageUpload", "L'image ne doit pas dépasser 5Mo.");
+                }
+                else if (!validFileTypes.Contains(ImageUpload.ContentType))
+                {
+                    ModelState.AddModelError("ImageUpload", "Le format de l'image doit être .jpg, .jpeg ou .png.");
+                }
+            }
+
+            if (!validCategories.Contains(product.Category))
+            {
+                ModelState.AddModelError("Category", "Veuillez sélectionner une catégorie valide.");
+            }
+
             if (ModelState.IsValid && ImageUpload != null)
             {
                 product.Id = _context.Products.DefaultIfEmpty().Max(p => p == null ? 0 : p.Id) + 1;
@@ -94,6 +130,7 @@ namespace Mercadona4.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Dashboard));
             }
+
             ViewData["PromotionId"] = new SelectList(_context.Promotions, "Id", "Id", product.PromotionId);
             return View(product);
         }
@@ -171,6 +208,42 @@ namespace Mercadona4.Controllers
             if (id != product.Id)
             {
                 return NotFound();
+            }
+
+            var validCategories = new List<string> { "Fruits", "Légumes", "Produits laitiers", "Surgelés" };
+            var validFileTypes = new List<string> { "image/jpeg", "image/png" };
+
+            if (product.Label.Length > 14 || product.Label.Length < 3)
+            {
+                ModelState.AddModelError("Label", "Le nom du produit doit comporter entre 3 et 14 caractères.");
+            }
+
+            if (product.Description.Length == 0)
+            {
+                ModelState.AddModelError("Description", "La description est obligatoire.");
+            }
+
+            if (product.Price < 0.01m || product.Price > 999.99m)
+            {
+                ModelState.AddModelError("Price", "Le prix doit être entre 0,01€ et 999,99€.");
+            }
+
+            if (ImageUpload != null)
+            {
+                var fileSize = ImageUpload.Length / 1024 / 1024; // size in MB
+                if (fileSize > 5)
+                {
+                    ModelState.AddModelError("ImageUpload", "L'image ne doit pas dépasser 5Mo.");
+                }
+                else if (!validFileTypes.Contains(ImageUpload.ContentType))
+                {
+                    ModelState.AddModelError("ImageUpload", "Le format de l'image doit être .jpg, .jpeg ou .png.");
+                }
+            }
+
+            if (!validCategories.Contains(product.Category))
+            {
+                ModelState.AddModelError("Category", "Veuillez sélectionner une catégorie valide.");
             }
 
             if (ModelState.IsValid)

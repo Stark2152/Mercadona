@@ -49,10 +49,30 @@ namespace Mercadona4.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(promotion);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var now = DateTime.Now.Date;
+                if (promotion.StartDate < now)
+                {
+                    ModelState.AddModelError("StartDate", "La date de début ne peut pas être avant la date actuelle.");
+                }
+
+                if (promotion.StartDate >= promotion.EndDate)
+                {
+                    ModelState.AddModelError("EndDate", "La date de fin ne peut pas précéder la date de début.");
+                }
+
+                if (promotion.DiscountPercentage < 5 || promotion.DiscountPercentage > 90)
+                {
+                    ModelState.AddModelError("DiscountPercentage", "Le pourcentage de réduction doit être situé entre 5 et 90%.");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    _context.Add(promotion);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
+
             return View(promotion);
         }
 
@@ -91,23 +111,43 @@ namespace Mercadona4.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                var now = DateTime.Now.Date;
+                if (promotion.StartDate < now)
                 {
-                    _context.Update(promotion);
-                    await _context.SaveChangesAsync();
+                    ModelState.AddModelError("StartDate", "La date de début ne peut pas être avant la date actuelle.");
                 }
-                catch (DbUpdateConcurrencyException)
+
+                if (promotion.StartDate >= promotion.EndDate)
                 {
-                    if (!PromotionExists(promotion.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError("EndDate", "La date de fin ne peut pas précéder la date de début.");
                 }
-                return RedirectToAction(nameof(Index));
+
+                if (promotion.DiscountPercentage < 5 || promotion.DiscountPercentage > 90)
+                {
+                    ModelState.AddModelError("DiscountPercentage", "Le pourcentage de réduction doit être situé entre 5 et 90%.");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(promotion);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!PromotionExists(promotion.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+
+                    return RedirectToAction(nameof(Index));
+                }
             }
             return View(promotion);
         }

@@ -8,20 +8,62 @@
 
 <a class="returnbutton" asp-action="Index">Retour</a>
 
-<form asp-action="Create">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form id="promotion-form" asp-action="Create">
+    <input id="startDate-input" asp-for="StartDate" />
+    <div id="startDate-error" class="text-danger"></div>
 
-    <input asp-for="StartDate" />
-    <span asp-validation-for="StartDate" class="text-danger"></span>
+    <input id="endDate-input" asp-for="EndDate" />
+    <div id="endDate-error" class="text-danger"></div>
 
-    <input asp-for="EndDate" />
-    <span asp-validation-for="EndDate" class="text-danger"></span>
+    <input id="discountPercentage-input" asp-for="DiscountPercentage" placeholder="Pourcentage de réduction" />
+    <div id="discountPercentage-error" class="text-danger"></div>
 
-    <input asp-for="DiscountPercentage" placeholder="Pourcentage de réduction" />
-    <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
-
-    <input type="submit" value="Créer" />
+    <input id="submit-button" type="submit" value="Créer" />
 </form>
+
+<script>
+    document.getElementById('promotion-form').addEventListener('submit', function (event) {
+        var isValid = true;
+
+        var startDateInput = document.getElementById('startDate-input');
+        var startDateError = document.getElementById('startDate-error');
+        var startDate = new Date(startDateInput.value);
+        var now = new Date();
+        now.setHours(0, 0, 0, 0); // réinitialiser l'heure pour comparer seulement les dates
+
+        if (startDate < now) {
+            isValid = false;
+            startDateError.textContent = 'La date de début ne peut pas être avant la date actuelle.';
+        } else {
+            startDateError.textContent = '';
+        }
+
+        var endDateInput = document.getElementById('endDate-input');
+        var endDateError = document.getElementById('endDate-error');
+        var endDate = new Date(endDateInput.value);
+
+        if (startDate >= endDate) {
+            isValid = false;
+            endDateError.textContent = 'La date de fin ne peut pas précéder la date de début.';
+        } else {
+            endDateError.textContent = '';
+        }
+
+        var discountPercentageInput = document.getElementById('discountPercentage-input');
+        var discountPercentageError = document.getElementById('discountPercentage-error');
+        var discountPercentage = parseFloat(discountPercentageInput.value);
+        if (isNaN(discountPercentage) || discountPercentage < 5 || discountPercentage > 90) {
+            isValid = false;
+            discountPercentageError.textContent = 'Le pourcentage de réduction doit être situé entre 5 et 90%.';
+        } else {
+            discountPercentageError.textContent = '';
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+</script>
 
 @section Scripts {
     @{
