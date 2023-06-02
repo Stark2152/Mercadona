@@ -247,7 +247,7 @@ form {
 
 .product {
     width: 20%;
-    height: 61vh;
+    height: 62vh;
     margin: 2%;
     padding: 1%;
     background-color: #f8f8f8;
@@ -285,6 +285,10 @@ form {
     font-size: 1.5vw;
     font-weight: bold;
     color: #333;
+    height: 5vh;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .product-description {
