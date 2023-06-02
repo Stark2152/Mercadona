@@ -5,22 +5,26 @@ namespace Mercadona4.Models
 {
     public class Product
     {
-        [Key]
+        [Key]  // Attribut indiquant que cette propriété est une clé primaire dans la base de données.
         public int Id { get; set; }
 
-        [Required]
-        public string Label { get; set; } = null!;
-        [Required]
-        public string Description { get; set; } = null!;
-        [Required]
-        public decimal Price { get; set; }
-        public string? ImageUrl { get; set; }
-        [Required]
-        public string Category { get; set; } = null!;
+        [Required]  // Attribut indiquant que cette propriété est obligatoire (ne peut pas être null) dans la base de données.
+        public string Label { get; set; } = null!;  // Le libellé du produit. L'opérateur "null!" est utilisé pour dire au compilateur que cette propriété ne sera jamais null lors de l'exécution.
 
-        [ForeignKey("Promotion")]
-        public int? PromotionId { get; set; }
+        [Required]
+        public string Description { get; set; } = null!;  // La description du produit.
 
-        public Promotion? Promotion { get; set; }
+        [Required]
+        public decimal Price { get; set; }  // Le prix du produit.
+
+        public string? ImageUrl { get; set; }  // L'URL de l'image du produit.
+
+        [Required]
+        public string Category { get; set; } = null!;  // La catégorie du produit.
+
+        [ForeignKey("Promotion")]  // Attribut indiquant que cette propriété est une clé étrangère, qui fait référence à la table "Promotion" dans la base de données.
+        public int? PromotionId { get; set; }  // L'ID de la promotion associée au produit. Cette propriété est facultative (peut être null).
+
+        public Promotion? Promotion { get; set; }  // L'entité de promotion associée au produit.
     }
 }

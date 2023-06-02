@@ -27,6 +27,7 @@
         <option value="Légumes">Légumes</option>
         <option value="Produits laitiers">Produits laitiers</option>
         <option value="Surgelés">Surgelés</option>
+        <option value="Multimédia">Multimédia</option>
     </select>
     <div id="category-error" class="text-danger"></div>
 
@@ -58,12 +59,12 @@
 
         var labelInput = document.getElementById('label-input');
         var labelError = document.getElementById('label-error');
-        if (labelInput.value.length > 14 || labelInput.value.length < 3) {
+        if (labelInput.value.length > 35 || labelInput.value.length < 3) {
             isValid = false;
             if (labelInput.value.length < 3) {
                 labelError.textContent = 'Le nom du produit doit comporter au moins 3 caractères.';
             } else {
-                labelError.textContent = 'Le nom du produit ne doit pas dépasser 14 caractères.';
+                labelError.textContent = 'Le nom du produit ne doit pas dépasser 35 caractères.';
             }
         } else {
             labelError.textContent = '';
@@ -112,7 +113,7 @@
 
         var categoryInput = document.getElementById('category-input');
         var categoryError = document.getElementById('category-error');
-        var validCategories = ['Fruits', 'Légumes', 'Produits laitiers', 'Surgelés'];
+        var validCategories = ['Fruits', 'Légumes', 'Produits laitiers', 'Surgelés', 'Multimédia'];
         if (!validCategories.includes(categoryInput.value)) {
             isValid = false;
             categoryError.textContent = 'Veuillez sélectionner une catégorie valide.';

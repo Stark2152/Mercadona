@@ -5,10 +5,13 @@ using Mercadona4.Models;
 
 namespace Mercadona4.Controllers
 {
+    // Contrôleur pour gérer les promotions
     public class PromotionsController : Controller
     {
+        // Injection de dépendances pour le contexte de base de données de l'application
         private readonly ApplicationDbContext _context;
 
+        // Constructeur pour initialiser le contexte de base de données
         public PromotionsController(ApplicationDbContext context)
         {
             _context = context;
@@ -17,14 +20,18 @@ namespace Mercadona4.Controllers
         // GET: Promotions
         public async Task<IActionResult> Index()
         {
+            // Vérification si l'utilisateur est authentifié
             if (HttpContext.Session.GetString("Authenticated") == "true")
             {
+                // Si l'utilisateur est authentifié, récupération et affichage de toutes les promotions
+                // Si _context.Promotions est null, renvoie un message d'erreur
                 return _context.Promotions != null ?
                         View(await _context.Promotions.ToListAsync()) :
-                        Problem("Entity set 'ApplicationDbContext.Promotions'  is null.");
+                        Problem("L'ensemble d'entités 'ApplicationDbContext.Promotions' est null.");
             }
             else
             {
+                // Si l'utilisateur n'est pas authentifié, redirection vers la page de connexion
                 return RedirectToAction("Login", "Account");
             }
         }
@@ -32,12 +39,15 @@ namespace Mercadona4.Controllers
         // GET: Promotions/Create
         public IActionResult Create()
         {
+            // Vérification si l'utilisateur est authentifié
             if (HttpContext.Session.GetString("Authenticated") == "true")
             {
+                // Si l'utilisateur est authentifié, affichage de la page de création de promotion
                 return View();
             }
             else
             {
+                // Si l'utilisateur n'est pas authentifié, redirection vers la page de connexion
                 return RedirectToAction("Login", "Account");
             }
         }
@@ -47,6 +57,7 @@ namespace Mercadona4.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,StartDate,EndDate,DiscountPercentage")] Promotion promotion)
         {
+            // Vérification de la validité des données du formulaire
             if (ModelState.IsValid)
             {
                 var now = DateTime.Now.Date;
@@ -65,6 +76,7 @@ namespace Mercadona4.Controllers
                     ModelState.AddModelError("DiscountPercentage", "Le pourcentage de réduction doit être situé entre 5 et 90%.");
                 }
 
+                // Si les données sont valides, enregistrement de la nouvelle promotion et redirection vers la page des promotions
                 if (ModelState.IsValid)
                 {
                     _context.Add(promotion);
@@ -73,28 +85,34 @@ namespace Mercadona4.Controllers
                 }
             }
 
+            // Si les données ne sont pas valides, renvoi à la page de création avec les erreurs de validation
             return View(promotion);
         }
 
         // GET: Promotions/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            // Vérification si l'utilisateur est authentifié
             if (HttpContext.Session.GetString("Authenticated") == "true")
             {
+                // Vérification de l'existence de la promotion
                 if (id == null || _context.Promotions == null)
                 {
                     return NotFound();
                 }
 
+                // Récupération de la promotion à modifier
                 var promotion = await _context.Promotions.FindAsync(id);
                 if (promotion == null)
                 {
                     return NotFound();
                 }
+                // Affichage de la page d'édition de la promotion
                 return View(promotion);
             }
             else
             {
+                // Si l'utilisateur n'est pas authentifié, redirection vers la page de connexion
                 return RedirectToAction("Login", "Account");
             }
         }
@@ -155,13 +173,16 @@ namespace Mercadona4.Controllers
         // GET: Promotions/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            // Vérification si l'utilisateur est authentifié
             if (HttpContext.Session.GetString("Authenticated") == "true")
             {
+                // Vérification de l'existence de la promotion
                 if (id == null || _context.Promotions == null)
                 {
                     return NotFound();
                 }
 
+                // Récupération de la promotion à supprimer
                 var promotion = await _context.Promotions
                     .FirstOrDefaultAsync(m => m.Id == id);
                 if (promotion == null)
@@ -169,10 +190,12 @@ namespace Mercadona4.Controllers
                     return NotFound();
                 }
 
+                // Affichage de la page de confirmation de suppression de la promotion
                 return View(promotion);
             }
             else
             {
+                // Si l'utilisateur n'est pas authentifié, redirection vers la page de connexion
                 return RedirectToAction("Login", "Account");
             }
         }
@@ -182,12 +205,13 @@ namespace Mercadona4.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // Vérification de l'existence de l'ensemble de promotions
             if (_context.Promotions == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Promotions'  is null.");
+                return Problem("L'ensemble d'entités 'ApplicationDbContext.Promotions' est null.");
             }
 
-            // Set PromotionId to null for all products using this promotion
+            // Suppression de la référence à cette promotion pour tous les produits qui l'utilisent
             var productsWithPromotion = _context.Products.Where(p => p.PromotionId == id);
             foreach (var product in productsWithPromotion)
             {
@@ -195,18 +219,24 @@ namespace Mercadona4.Controllers
             }
             await _context.SaveChangesAsync();
 
+            // Suppression de la promotion
             var promotion = await _context.Promotions.FindAsync(id);
             if (promotion != null)
             {
                 _context.Promotions.Remove(promotion);
             }
 
+            // Sauvegarde des changements dans la base de données
             await _context.SaveChangesAsync();
+            // Redirection vers la page des promotions
             return RedirectToAction(nameof(Index));
         }
 
+        // Méthode privée pour vérifier l'existence d'une promotion dans la base de données
         private bool PromotionExists(int id)
         {
+            // Vérification si l'ensemble des promotions est null
+            // Si non, vérification de l'existence de la promotion
             return (_context.Promotions?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }

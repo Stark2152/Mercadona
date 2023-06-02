@@ -4,14 +4,17 @@ namespace Mercadona4.Models
 {
     public class Promotion
     {
-        [Key]
+        [Key]  // Cette propriété est une clé primaire dans la base de données.
         public int Id { get; set; }
 
+        [Required]  // Cette propriété est obligatoire.
+        public DateTime StartDate { get; set; }  // La date de début de la promotion.
+
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }  // La date de fin de la promotion.
+
         [Required]
-        public DateTime EndDate { get; set; }
-        [Required]
-        public decimal DiscountPercentage { get; set; }
+        public decimal DiscountPercentage { get; set; }  // Le pourcentage de réduction offert par la promotion.
+
     }
 }
