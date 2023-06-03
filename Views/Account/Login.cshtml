@@ -14,17 +14,32 @@
 <span class="information">*Le mot de passe est : "<strong>JB6ZSWU2S3</strong>" (mot de passe sécurisé et inaccessible que seul les admins du supermarché connaîtront et qui est gérable depuis le tableau de bord Azure)*</span>
 
 <script>
+    // Lorsque le document est prêt...
     $(document).ready(function () {
+        // Lorsque le formulaire avec l'id "loginForm" est soumis...
         $("#loginForm").submit(function (e) {
+            // Empêcher le comportement par défaut de l'événement de soumission (envoi direct du formulaire)
             e.preventDefault();
+
+            // Effectuer une requête Ajax
             $.ajax({
+                // URL de l'action à appeler sur le serveur (ici, la méthode "Login" du contrôleur "Account")
                 url: '@Url.Action("Login", "Account")',
+
+                // Méthode HTTP à utiliser (ici, POST)
                 type: 'POST',
+
+                // Données à envoyer avec la requête (ici, les données du formulaire)
                 data: $(this).serialize(),
+
+                // Que faire en cas de succès de la requête...
                 success: function (data) {
+                    // Si la réponse indique un succès...
                     if (data.success) {
+                        // Rediriger vers l'action "Dashboard" du contrôleur "Products"
                         window.location.href = '@Url.Action("Dashboard", "Products")';
                     } else {
+                        // Sinon, afficher le message d'erreur renvoyé par le serveur
                         $('#errorMessage').text(data.message);
                     }
                 }

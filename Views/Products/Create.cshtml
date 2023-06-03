@@ -33,18 +33,24 @@
 
     <select asp-for="PromotionId">
         <option value="">Sans promotion</option>
-        @if (ViewBag.PromotionId != null)
+        @if (ViewBag.PromotionId != null) // Si la ViewBag contient une valeur pour "PromotionId"...
         {
+            // Tente de convertir la valeur de "PromotionId" en SelectList
             var promotionList = ViewBag.PromotionId as SelectList;
+
+            // Si la conversion a réussi et que la liste n'est pas vide...
             if (promotionList != null && promotionList.Any())
             {
+                // Parcourir chaque élément de la liste...
                 foreach (var item in promotionList)
                 {
+                    // ...et générer une option de sélection pour chaque promotion
                     <option value="@item.Value">@item.Text</option>
                 }
             }
             else
             {
+                // Si aucune promotion n'a été trouvée, générer une option de sélection désactivée avec un message approprié
                 <option disabled>Aucune promotion trouvée. Veuillez en créer une pour qu'elle apparaisse ici.</option>
             }
         }
@@ -54,11 +60,15 @@
 </form>
 
 <script>
+    // Ajout d'un gestionnaire d'événement 'submit' pour le formulaire d'identification de produit
     document.getElementById('product-form').addEventListener('submit', function (event) {
+        // Initialiser un indicateur de validité du formulaire à true
         var isValid = true;
 
+        // Obtention des références pour l'entrée et l'erreur du label
         var labelInput = document.getElementById('label-input');
         var labelError = document.getElementById('label-error');
+        // Validation du label (entre 3 et 35 caractères)
         if (labelInput.value.length > 35 || labelInput.value.length < 3) {
             isValid = false;
             if (labelInput.value.length < 3) {
@@ -70,6 +80,7 @@
             labelError.textContent = '';
         }
 
+        // Idem pour la description (ne doit pas être vide)
         var descriptionInput = document.getElementById('description-input');
         var descriptionError = document.getElementById('description-error');
         if (descriptionInput.value.length === 0) {
@@ -79,6 +90,7 @@
             descriptionError.textContent = '';
         }
 
+        // Idem pour le prix (doit être un nombre compris entre 0,01 et 999,99)
         var priceInput = document.getElementById('price-input');
         var priceError = document.getElementById('price-error');
         var priceValue = priceInput.value.replace('.', ',');  // Remplacer le point par une virgule
@@ -91,6 +103,7 @@
             priceInput.value = priceValue; // Rétablir la valeur d'origine (avec une virgule) après la validation
         }
 
+        // Idem pour l'image (doit être présente, <150Mo et de type JPEG ou PNG)
         var imageInput = document.getElementById('image-input');
         var imageError = document.getElementById('image-error');
         var file = imageInput.files[0];
@@ -98,7 +111,7 @@
             isValid = false;
             imageError.textContent = 'L\'image est obligatoire.';
         } else {
-            var fileSize = file.size / 1024 / 1024; // size in MB
+            var fileSize = file.size / 1024 / 1024; // poids en MB
             var validFileTypes = ['image/jpeg', 'image/png'];
             if (fileSize > 150) {
                 isValid = false;
@@ -111,6 +124,7 @@
             }
         }
 
+        // Idem pour la catégorie (doit être dans la liste prédéfinie de catégories valides)
         var categoryInput = document.getElementById('category-input');
         var categoryError = document.getElementById('category-error');
         var validCategories = ['Fruits', 'Légumes', 'Produits laitiers', 'Surgelés', 'Multimédia'];
@@ -121,6 +135,7 @@
             categoryError.textContent = '';
         }
 
+        // Si le formulaire n'est pas valide, empêcher son envoi
         if (!isValid) {
             event.preventDefault();
         }

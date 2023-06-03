@@ -25,6 +25,7 @@
 </form>
 
 <script>
+    // Pareil que pour la création d'une promotion
     document.getElementById('promotion-form').addEventListener('submit', function (event) {
         var isValid = true;
 
@@ -32,7 +33,7 @@
         var startDateError = document.getElementById('startDate-error');
         var startDate = new Date(startDateInput.value);
         var now = new Date();
-        now.setHours(0, 0, 0, 0); // réinitialiser l'heure pour comparer seulement les dates
+        now.setHours(0, 0, 0, 0);
 
         if (startDate < now) {
             isValid = false;
