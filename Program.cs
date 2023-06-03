@@ -8,8 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Ajoute le service ApplicationDbContext au conteneur d'injection de dépendances avec une configuration spécifique
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
+    // Utilise le fournisseur Npgsql (PostgreSQL) pour le contexte de base de données
+    // Récupère la chaîne de connexion "DefaultConnection" à partir de la configuration de l'application
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
@@ -31,12 +34,19 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-// Configure Request Localization
+// Définir les cultures supportées
 var supportedCultures = new[] { "fr-FR" };
+
+// Configurer les options de localisation de l'application
 var localizationOptions = new RequestLocalizationOptions
 {
+    // Culture par défaut pour le traitement des requêtes
     DefaultRequestCulture = new RequestCulture("fr-FR"),
+
+    // Liste des cultures supportées pour le contenu de l'application
     SupportedCultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
+
+    // Liste des cultures supportées pour l'interface utilisateur
     SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList()
 };
 
