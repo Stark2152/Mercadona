@@ -79,6 +79,8 @@ namespace Mercadona4.Controllers
                 // Si les données sont valides, enregistrement de la nouvelle promotion et redirection vers la page des promotions
                 if (ModelState.IsValid)
                 {
+                    promotion.Id = _context.Promotions.DefaultIfEmpty().Max(p => p == null ? 0 : p.Id) + 1;
+
                     _context.Add(promotion);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
